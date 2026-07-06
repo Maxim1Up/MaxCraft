@@ -78,8 +78,110 @@
   .touch-ui { display: none; }
   body.touch .touch-ui { display: block; }
   body.touch #debug { font-size: 11px; padding: 4px 8px; }
-  body.touch .slot { width: 42px; height: 42px; pointer-events: auto; }
-  body.touch .slot canvas { width: 32px; height: 32px; }
+  body.touch .slot { width: 40px; height: 40px; pointer-events: auto; }
+  body.touch .slot canvas { width: 30px; height: 30px; }
+
+  /* ---------- Выживание: сердца, счётчики, прогресс, окна ---------- */
+  #hearts {
+    position: absolute; bottom: 76px; left: 50%; transform: translateX(-50%);
+    display: none; gap: 1px; font-size: 20px; text-shadow: 1px 1px 0 #000;
+  }
+  body.touch #hearts { bottom: 62px; font-size: 16px; }
+  #hearts .full { color: #e33b3b; }
+  #hearts .half { color: #f0908f; }
+  #hearts .empty { color: #3a3a3a; }
+  .slot .cnt {
+    position: absolute; bottom: 1px; right: 3px; font-size: 13px; font-weight: bold;
+    color: #fff; text-shadow: 1px 1px 0 #000;
+  }
+  #blockname { bottom: 104px !important; }
+  #minebar {
+    position: absolute; left: 50%; top: 55%; transform: translateX(-50%);
+    width: 90px; height: 8px; background: rgba(0,0,0,.5);
+    border: 1px solid #fff; display: none;
+  }
+  #minebar div { height: 100%; width: 0; background: #7ec850; }
+  #flash {
+    position: absolute; inset: 0; z-index: 15; pointer-events: none;
+    background: #c00; opacity: 0;
+  }
+  .overlay {
+    position: absolute; inset: 0; z-index: 30; display: none;
+    align-items: center; justify-content: center; background: rgba(0,0,0,.55);
+  }
+  .overlay.show { display: flex; }
+  .panel {
+    background: #262b31; border: 3px solid #5a646f; padding: 20px 24px;
+    color: #fff; min-width: 320px; max-width: 92vw; max-height: 85vh; overflow-y: auto;
+  }
+  .panel h2 { margin-bottom: 14px; color: #ffd766; letter-spacing: 1px; }
+  .deathpanel { text-align: center; border-color: #a33; }
+  .deathpanel h2 { color: #e33b3b; }
+  .pbtn {
+    font-family: inherit; font-size: 16px; padding: 10px 28px; cursor: pointer;
+    background: #6d9c47; color: #fff; border: 2px solid #1e2d14;
+    box-shadow: 0 4px 0 #3c5a26; margin-top: 12px;
+  }
+  .pbtn:active { transform: translateY(2px); box-shadow: 0 2px 0 #3c5a26; }
+  /* ---------- Крафт в стиле Minecraft ---------- */
+  :root { --slot: 46px; }
+  body.touch { --slot: 36px; }
+  .mcpanel { background: #c6c6c6; border: 3px solid; border-color: #fff #555 #555 #fff; color: #3a3a3a; }
+  .mcpanel h2 { color: #3a3a3a; margin: 0; font-size: 20px; }
+  .mc-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .mc-head button {
+    font-family: inherit; font-size: 13px; padding: 6px 10px; cursor: pointer;
+    background: #8b8b8b; border: 2px solid; border-color: #fff #494949 #494949 #fff; color: #fff;
+  }
+  .mc-label { font-size: 13px; color: #404040; margin: 8px 0 4px; }
+  .mgrid { display: grid; gap: 3px; width: max-content; touch-action: none; }
+  .inv9 { grid-template-columns: repeat(9, var(--slot)); }
+  .hotrow { margin-top: 8px; }
+  .mslot {
+    width: var(--slot); height: var(--slot); position: relative; cursor: pointer;
+    background: #8b8b8b; border: 2px solid; border-color: #373737 #fff #fff #373737;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-user-select: none; user-select: none; touch-action: none;
+  }
+  .mslot canvas { width: calc(var(--slot) - 12px); height: calc(var(--slot) - 12px);
+    image-rendering: pixelated; pointer-events: none; }
+  .mslot .cnt2 {
+    position: absolute; bottom: 0; right: 2px; font-size: 14px; font-weight: bold;
+    color: #fff; text-shadow: 1px 1px 0 #3f3f3f; pointer-events: none;
+  }
+  .mslot.big { width: calc(var(--slot) + 10px); height: calc(var(--slot) + 10px); }
+  .mslot.ghost canvas { opacity: .85; }
+  .craft-top { display: flex; align-items: center; gap: 12px; margin: 6px 0 4px; }
+  .r-arrow { color: #3a3a3a; font-size: 22px; }
+  .r-n { font-size: 13px; color: #404040; }
+  #cursorItem {
+    position: fixed; z-index: 45; pointer-events: none; display: none;
+    background: none; border: none;
+  }
+  #book {
+    max-height: 200px; overflow-y: auto; margin-bottom: 10px;
+    background: #9d9d9d; border: 2px solid; border-color: #373737 #fff #fff #373737;
+    padding: 6px;
+  }
+  .book-row {
+    display: flex; align-items: center; gap: 10px; padding: 6px 4px;
+    border-bottom: 1px solid #8a8a8a;
+  }
+  .book-in { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+  .book-in > canvas { width: 24px; height: 24px; image-rendering: pixelated; }
+  .mini-grid { display: grid; gap: 2px; }
+  .mini-cell {
+    width: 22px; height: 22px; background: #8b8b8b;
+    border: 1px solid #6f6f6f; display: flex; align-items: center; justify-content: center;
+  }
+  .mini-cell canvas { width: 18px; height: 18px; image-rendering: pixelated; }
+  .chip {
+    font-size: 11px; background: #6d9c47; color: #fff; padding: 2px 7px;
+    border: 1px solid #3c5a26; align-self: center;
+  }
+  .modes { display: flex; gap: 14px; }
+  .modes button { background: #4a7fb5; box-shadow: 0 5px 0 #2a4a6d; border-color: #14273b; }
+  #btnCraft { right: 40px; bottom: 270px; width: 52px; height: 52px; font-size: 22px; }
 
   #joystick {
     position: absolute; left: 22px; bottom: 90px; width: 130px; height: 130px;
@@ -114,7 +216,9 @@
 
 <div id="hud">
   <div id="crosshair"></div>
+  <div id="minebar"><div></div></div>
   <div id="blockname"></div>
+  <div id="hearts"></div>
   <div id="hotbar"></div>
   <div id="debug"></div>
   <div class="touch-ui">
@@ -122,32 +226,73 @@
     <div id="btnJump" class="tbtn">⤒</div>
     <div id="btnDown" class="tbtn">⤓</div>
     <div id="btnFly" class="tbtn">✈</div>
+    <div id="btnCraft" class="tbtn" style="display:none">🛠</div>
     <div id="btnPause">| |</div>
+  </div>
+</div>
+
+<div id="flash"></div>
+
+<div id="craft" class="overlay">
+  <div class="panel mcpanel">
+    <div class="mc-head">
+      <h2 id="craftTitle">Инвентарь</h2>
+      <button id="bookBtn">📖 Рецепты</button>
+    </div>
+    <div id="book" style="display:none"></div>
+    <div class="craft-top">
+      <span class="mc-label">Крафт</span>
+      <div id="craftGrid" class="mgrid"></div>
+      <span class="r-arrow">→</span>
+      <div id="resultSlot" class="mslot big"></div>
+    </div>
+    <div class="mc-label">Инвентарь</div>
+    <div id="invMain" class="mgrid inv9"></div>
+    <div id="invHot" class="mgrid inv9 hotrow"></div>
+    <button id="craftClose" class="pbtn">Закрыть</button>
+  </div>
+</div>
+<div id="cursorItem" class="mslot"></div>
+
+<div id="death" class="overlay">
+  <div class="panel deathpanel">
+    <h2>Вы погибли</h2>
+    <button id="respawnBtn" class="pbtn">Возродиться</button>
   </div>
 </div>
 
 <div id="menu">
   <h1>WEBCRAFT</h1>
   <div class="sub">бесконечный воксельный мир прямо в браузере</div>
-  <button id="playBtn">Играть</button>
+  <div class="modes">
+    <button id="btnCreative">🪶 Творчество</button>
+    <button id="btnSurvival">⛏ Выживание</button>
+  </div>
+  <button id="playBtn" style="display:none">Продолжить</button>
   <div id="controls">
     <b>W A S D</b> движение<br>
     <b>Мышь</b> обзор<br>
     <b>ЛКМ / ПКМ</b> ломать / ставить блок<br>
+    <b>ЛКМ по зомби</b> атака (мечом сильнее)<br>
+    <b>ПКМ с яблоком</b> съесть (+2 ❤)<br>
     <b>СКМ</b> выбрать блок под прицелом<br>
     <b>Пробел</b> прыжок (в воде — плыть вверх)<br>
     <b>Shift</b> бег (в полёте — вниз)<br>
     <b>1–9 / колесо</b> выбор блока<br>
-    <b>F</b> режим полёта<br>
+    <b>E</b> инвентарь + крафт 2×2<br>
+    <b>ПКМ по верстаку</b> крафт 3×3<br>
+    <b>F</b> режим полёта (творчество)<br>
     <b>Esc</b> пауза
   </div>
   <div id="controlsTouch" style="display:none">
     <b>Джойстик</b> движение<br>
     <b>Свайп</b> обзор<br>
     <b>Удержание</b> ломать блок<br>
-    <b>Короткий тап</b> поставить блок<br>
+    <b>Короткий тап</b> поставить блок / удар по зомби<br>
+    <b>Тап с яблоком</b> съесть (+2 ❤)<br>
     <b>⤒</b> прыжок / вверх в полёте<br>
-    <b>✈</b> режим полёта (⤓ — вниз)<br>
+    <b>✈</b> полёт (творчество), <b>🛠</b> крафт<br>
+    <b>Тап по верстаку</b> расширенный крафт<br>
     <b>Хотбар</b> тап по ячейке — выбор блока
   </div>
 </div>
@@ -176,29 +321,122 @@ if (IS_TOUCH) {
 
 // ---------- Блоки ----------
 const B = { air:0, grass:1, dirt:2, stone:3, sand:4, log:5, leaves:6,
-            planks:7, cobble:8, glass:9, water:10, bedrock:11 };
+            planks:7, cobble:8, glass:9, water:10, bedrock:11, crafting:12, bricks:13 };
 
 // tiles: порядок граней [-x, +x, -y, +y, -z, +z], номера тайлов в атласе
 const BLOCKS = {
-  [B.grass]:   { name:'Трава',    tiles:[1,1,2,0,1,1],   icon:0  },
-  [B.dirt]:    { name:'Земля',    tiles:[2,2,2,2,2,2],   icon:2  },
-  [B.stone]:   { name:'Камень',   tiles:[3,3,3,3,3,3],   icon:3  },
-  [B.sand]:    { name:'Песок',    tiles:[4,4,4,4,4,4],   icon:4  },
-  [B.log]:     { name:'Бревно',   tiles:[5,5,6,6,5,5],   icon:5  },
-  [B.leaves]:  { name:'Листва',   tiles:[7,7,7,7,7,7],   icon:7  },
-  [B.planks]:  { name:'Доски',    tiles:[8,8,8,8,8,8],   icon:8  },
-  [B.cobble]:  { name:'Булыжник', tiles:[9,9,9,9,9,9],   icon:9  },
-  [B.glass]:   { name:'Стекло',   tiles:[10,10,10,10,10,10], icon:10 },
-  [B.water]:   { name:'Вода',     tiles:[11,11,11,11,11,11], icon:11 },
-  [B.bedrock]: { name:'Бедрок',   tiles:[12,12,12,12,12,12], icon:12 },
+  [B.grass]:    { name:'Трава',    tiles:[1,1,2,0,1,1],   icon:0  },
+  [B.dirt]:     { name:'Земля',    tiles:[2,2,2,2,2,2],   icon:2  },
+  [B.stone]:    { name:'Камень',   tiles:[3,3,3,3,3,3],   icon:3  },
+  [B.sand]:     { name:'Песок',    tiles:[4,4,4,4,4,4],   icon:4  },
+  [B.log]:      { name:'Бревно',   tiles:[5,5,6,6,5,5],   icon:5  },
+  [B.leaves]:   { name:'Листва',   tiles:[7,7,7,7,7,7],   icon:7  },
+  [B.planks]:   { name:'Доски',    tiles:[8,8,8,8,8,8],   icon:8  },
+  [B.cobble]:   { name:'Булыжник', tiles:[9,9,9,9,9,9],   icon:9  },
+  [B.glass]:    { name:'Стекло',   tiles:[10,10,10,10,10,10], icon:10 },
+  [B.water]:    { name:'Вода',     tiles:[11,11,11,11,11,11], icon:11 },
+  [B.bedrock]:  { name:'Бедрок',   tiles:[12,12,12,12,12,12], icon:12 },
+  [B.crafting]: { name:'Верстак',  tiles:[14,14,8,13,14,14], icon:13 },
+  [B.bricks]:   { name:'Кирпичи',  tiles:[15,15,15,15,15,15], icon:15 },
 };
 const TRANSPARENT = new Set([B.air, B.leaves, B.glass, B.water]);
 const isSolid  = b => b !== B.air && b !== B.water;
 const isTransp = b => TRANSPARENT.has(b);
-const HOTBAR = [B.grass, B.dirt, B.stone, B.sand, B.log, B.leaves, B.planks, B.cobble, B.glass];
+const CREATIVE_HOTBAR = [B.grass, B.dirt, B.stone, B.sand, B.log, B.leaves,
+                         B.planks, B.cobble, B.glass, B.crafting, B.bricks];
+
+// ---------- Предметы, инструменты, прочность, дроп ----------
+const ITEM_STICK = 100;
+const ITEM_APPLE = 109;
+const T = { wpick:101, spick:102, waxe:103, saxe:104,
+            wshovel:105, sshovel:106, wsword:107, ssword:108 };
+const ITEMS = {
+  [ITEM_STICK]: { name:'Палки', icon:16 },
+  [ITEM_APPLE]: { name:'Яблоко', icon:25 },
+  [T.wpick]:   { name:'Деревянная кирка',  icon:17, tool:{cat:'pick',   mult:2} },
+  [T.spick]:   { name:'Каменная кирка',    icon:18, tool:{cat:'pick',   mult:4} },
+  [T.waxe]:    { name:'Деревянный топор',  icon:19, tool:{cat:'axe',    mult:2} },
+  [T.saxe]:    { name:'Каменный топор',    icon:20, tool:{cat:'axe',    mult:4} },
+  [T.wshovel]: { name:'Деревянная лопата', icon:21, tool:{cat:'shovel', mult:2} },
+  [T.sshovel]: { name:'Каменная лопата',   icon:22, tool:{cat:'shovel', mult:4} },
+  [T.wsword]:  { name:'Деревянный меч',    icon:23, tool:{cat:'sword',  mult:2} },
+  [T.ssword]:  { name:'Каменный меч',      icon:24, tool:{cat:'sword',  mult:4} },
+};
+const nameOf = id => (BLOCKS[id] || ITEMS[id]).name;
+const iconOf = id => (BLOCKS[id] || ITEMS[id]).icon;
+const stackMax = id => (ITEMS[id] && ITEMS[id].tool) ? 1 : 64;
+
+const TOOL_CATS = {
+  pick:   new Set([B.stone, B.cobble, B.bricks]),
+  axe:    new Set([B.log, B.planks, B.crafting]),
+  shovel: new Set([B.dirt, B.grass, B.sand]),
+  sword:  new Set([B.leaves]),
+};
+function toolMult(heldId, block) {
+  const t = heldId != null && ITEMS[heldId] && ITEMS[heldId].tool;
+  return t && TOOL_CATS[t.cat].has(block) ? t.mult : 1;
+}
+
+// время ломания в секундах (выживание, голой рукой)
+const HARDNESS = { [B.grass]:.5, [B.dirt]:.5, [B.sand]:.45, [B.stone]:2.2,
+  [B.cobble]:2.2, [B.log]:1.4, [B.planks]:1.4, [B.leaves]:.25, [B.glass]:.3,
+  [B.crafting]:1.4, [B.bricks]:2.4 };
+// что выпадает (по умолчанию — сам блок)
+const DROPS = { [B.grass]:B.dirt, [B.stone]:B.cobble, [B.leaves]:null };
+
+// ---------- Рецепты ----------
+// Буквы: P — доски, L — бревно, C — булыжник, S — палка, пробел — пусто
+const KEY = { P:B.planks, L:B.log, C:B.cobble, S:ITEM_STICK };
+const RECIPES = [
+  { shapeless:[B.log],           out:[B.planks,4] },
+  { shapeless:[B.sand,B.sand],   out:[B.glass,1] },
+  { shapeless:[B.cobble],        out:[B.stone,1] },
+  { p:['PP','PP'],               out:[B.crafting,1] },
+  { p:['P','P'],                 out:[ITEM_STICK,4] },
+  { p:['CC','CC'],               out:[B.bricks,4] },
+  { p:['PPP',' S ',' S '],       out:[T.wpick,1] },
+  { p:['CCC',' S ',' S '],       out:[T.spick,1] },
+  { p:['PP','PS',' S'],          out:[T.waxe,1],    mirror:true },
+  { p:['CC','CS',' S'],          out:[T.saxe,1],    mirror:true },
+  { p:['P','S','S'],             out:[T.wshovel,1] },
+  { p:['C','S','S'],             out:[T.sshovel,1] },
+  { p:['P','P','S'],             out:[T.wsword,1] },
+  { p:['C','C','S'],             out:[T.ssword,1] },
+];
+const mirrorPat = p => p.map(r => [...r].reverse().join(''));
+
+// ---------- Режим игры и инвентарь ----------
+let mode = 'creative';        // 'creative' | 'survival'
+let started = false;
+let uiOpen = false;           // открыт крафт или экран смерти
+const inventory = new Array(36).fill(null);   // 0-8 хотбар, 9-35 рюкзак
+const hotbarLen = () => mode === 'creative' ? CREATIVE_HOTBAR.length : 9;
+
+function invAdd(id, n) {
+  const max = stackMax(id);
+  for (const s of inventory) if (s && s.id === id && s.count < max) {
+    const a = Math.min(n, max - s.count); s.count += a; n -= a;
+    if (!n) { renderHotbar(); return; }
+  }
+  for (let i = 0; i < 36 && n > 0; i++) if (!inventory[i]) {
+    inventory[i] = { id, count: Math.min(n, max) }; n -= inventory[i].count;
+  }
+  renderHotbar();
+}
+const invCount = id => inventory.reduce((a, s) => a + (s && s.id === id ? s.count : 0), 0);
+function invTake(id, n) {
+  for (let i = 0; i < 36 && n > 0; i++) {
+    const s = inventory[i];
+    if (s && s.id === id) {
+      const t = Math.min(n, s.count); s.count -= t; n -= t;
+      if (!s.count) inventory[i] = null;
+    }
+  }
+  renderHotbar();
+}
 
 // ---------- Атлас текстур (рисуем пиксель-арт на канвасе) ----------
-const ATLAS_TILES = 16, TS = 16;
+const ATLAS_TILES = 26, TS = 16;
 const atlasCanvas = document.createElement('canvas');
 atlasCanvas.width = ATLAS_TILES * TS; atlasCanvas.height = TS;
 
@@ -266,6 +504,84 @@ atlasCanvas.width = ATLAS_TILES * TS; atlasCanvas.height = TS;
   }
   noiseTile(11, [52, 96, 200], 0.15, 0.68);           // 11 вода
   noiseTile(12, [58, 58, 58], 0.5);                   // 12 бедрок
+  for (let y = 0; y < TS; y++) for (let x = 0; x < TS; x++) {   // 13 верстак (верх)
+    const border = x < 2 || y < 2 || x > TS - 3 || y > TS - 3;
+    const grid = x === 7 || x === 8 || y === 7 || y === 8;
+    const k = border ? 0.55 : grid ? 0.75 : 1;
+    const v = (1 + (rnd() - 0.5) * 0.12) * k;
+    put(13, x, y, 168 * v, 132 * v, 80 * v);
+  }
+  for (let y = 0; y < TS; y++) for (let x = 0; x < TS; x++) {   // 14 верстак (бок)
+    const line = (y % 4 === 3) ? 0.68 : 1;
+    const v = (1 + (rnd() - 0.5) * 0.12) * line;
+    put(14, x, y, 150 * v, 118 * v, 70 * v);
+  }
+  [[3,4],[4,4],[4,3],[11,4],[12,4],[11,5],[3,10],[4,11],[12,10],[11,11]]
+    .forEach(([x, y]) => put(14, x, y, 85, 85, 100));           // «инструменты»
+  for (let y = 0; y < TS; y++) for (let x = 0; x < TS; x++) {   // 15 кирпичи
+    const row = y >> 2;
+    const mortar = (y % 4 === 0) || ((x + (row % 2 ? 0 : 4)) % 8 === 0);
+    const v = 1 + (rnd() - 0.5) * 0.15;
+    if (mortar) put(15, x, y, 152 * v, 152 * v, 152 * v);
+    else put(15, x, y, 170 * v, 76 * v, 60 * v);
+  }
+  for (let i = 1; i < TS - 1; i++) {                            // 16 палка (иконка)
+    const v = 1 + (rnd() - 0.5) * 0.2;
+    put(16, i, TS - 1 - i, 120 * v, 92 * v, 55 * v);
+    put(16, i, TS - 2 - i, 104 * v, 82 * v, 50 * v);
+  }
+  // 17–24 инструменты
+  const WOODC = [163, 130, 78], STONEC = [138, 138, 138], HANDLE = [112, 88, 54];
+  const drawHandle = t => {
+    for (let i = 0; i < 8; i++) {
+      const x = 3 + i, y = 13 - i, v = 1 + (rnd() - 0.5) * 0.15;
+      put(t, x, y, HANDLE[0] * v, HANDLE[1] * v, HANDLE[2] * v);
+      put(t, x, y + 1, HANDLE[0] * v * 0.78, HANDLE[1] * v * 0.78, HANDLE[2] * v * 0.78);
+    }
+  };
+  const drawHead = (t, pts, col) => {
+    for (const [x, y] of pts) {
+      const v = 1 + (rnd() - 0.5) * 0.12;
+      put(t, x, y, col[0] * v, col[1] * v, col[2] * v);
+    }
+  };
+  const PICK = [];
+  for (let x = 4; x <= 12; x++) PICK.push([x, 2], [x, 3]);
+  PICK.push([3, 4], [2, 5], [2, 6], [13, 4], [14, 5], [14, 6]);
+  const AXE = [[7,2],[7,3]];
+  for (let y = 1; y <= 6; y++) for (let x = 8; x <= 12; x++)
+    if (!(y > 4 && x < 10)) AXE.push([x, y]);
+  const SHOVEL = [];
+  for (let y = 1; y <= 5; y++) for (let x = 9; x <= 13; x++) SHOVEL.push([x, y]);
+  SHOVEL.push([11, 6]);
+  const drawSword = (t, col) => {
+    for (let i = 0; i < 9; i++) {                 // клинок по диагонали
+      const x = 5 + i, y = 10 - i, v = 1 + (rnd() - 0.5) * 0.1;
+      put(t, x, y, col[0] * v, col[1] * v, col[2] * v);
+      put(t, x + 1, y, Math.min(255, col[0] * 1.25), Math.min(255, col[1] * 1.25), Math.min(255, col[2] * 1.25));
+    }
+    for (let i = 0; i < 4; i++) put(t, 2 + i, 14 - i, 112, 88, 54);   // рукоять
+    put(t, 6, 9, 55, 55, 55); put(t, 4, 11, 55, 55, 55);              // гарда
+    put(t, 5, 11, 55, 55, 55); put(t, 6, 10, 55, 55, 55);
+  };
+  drawHandle(17); drawHead(17, PICK, WOODC);      // деревянная кирка
+  drawHandle(18); drawHead(18, PICK, STONEC);     // каменная кирка
+  drawHandle(19); drawHead(19, AXE, WOODC);       // деревянный топор
+  drawHandle(20); drawHead(20, AXE, STONEC);      // каменный топор
+  drawHandle(21); drawHead(21, SHOVEL, WOODC);    // деревянная лопата
+  drawHandle(22); drawHead(22, SHOVEL, STONEC);   // каменная лопата
+  drawSword(23, WOODC);                           // деревянный меч
+  drawSword(24, STONEC);                          // каменный меч
+  for (let y = 4; y <= 12; y++) for (let x = 3; x <= 12; x++) {  // 25 яблоко
+    const dx = (x - 7.5) / 4.6, dy = (y - 8) / 4.4;
+    if (dx * dx + dy * dy <= 1) {
+      const v = 1 + (rnd() - 0.5) * 0.2;
+      put(25, x, y, 200 * v, 40 * v, 35 * v);
+    }
+  }
+  put(25, 5, 6, 240, 120, 110); put(25, 6, 5, 240, 120, 110);   // блик
+  put(25, 7, 2, 100, 70, 40); put(25, 7, 3, 100, 70, 40);       // черенок
+  put(25, 9, 3, 70, 150, 50); put(25, 10, 3, 70, 150, 50);      // листик
 })();
 
 // ---------- Шум и генерация рельефа ----------
@@ -521,36 +837,45 @@ const player = {
   onGround: false, flying: false,
   w: 0.3, h: 1.8, eye: 1.62,
   slot: 0,
+  health: 20, fallDist: 0,
 };
+const spawn = new THREE.Vector3();
 
 function findSpawn() {
   let x = 8;
   for (let i = 0; i < 64; i++) {
     const h = terrainHeight(x, 8);
-    if (h > SEA + 1) { player.pos.set(x + 0.5, h + 2, 8.5); return; }
+    if (h > SEA + 1) { player.pos.set(x + 0.5, h + 2, 8.5); spawn.copy(player.pos); return; }
     x += 8;
   }
   player.pos.set(8.5, SEA + 3, 8.5);
+  spawn.copy(player.pos);
 }
 
-function boxCollides(px, py, pz) {
-  const minX = Math.floor(px - player.w), maxX = Math.floor(px + player.w);
-  const minY = Math.floor(py),            maxY = Math.floor(py + player.h);
-  const minZ = Math.floor(pz - player.w), maxZ = Math.floor(pz + player.w);
+function aabbCollides(px, py, pz, w, h) {
+  const minX = Math.floor(px - w), maxX = Math.floor(px + w);
+  const minY = Math.floor(py),     maxY = Math.floor(py + h);
+  const minZ = Math.floor(pz - w), maxZ = Math.floor(pz + w);
   for (let x = minX; x <= maxX; x++)
     for (let y = minY; y <= maxY; y++)
       for (let z = minZ; z <= maxZ; z++)
         if (isSolid(getBlock(x, y, z))) return { x, y, z };
   return null;
 }
+const boxCollides = (px, py, pz) => aabbCollides(px, py, pz, player.w, player.h);
 
 const keys = {};
 addEventListener('keydown', e => {
   keys[e.code] = true;
-  if (e.code === 'KeyF' && playing) { player.flying = !player.flying; player.vel.y = 0; }
+  if (e.code === 'KeyF' && playing && mode === 'creative') { player.flying = !player.flying; player.vel.y = 0; }
+  if (e.code === 'KeyE') {
+    if (uiOpen) closeCraft();
+    else if (playing && mode === 'survival') openCraft(false);
+  }
+  if (e.code === 'Escape' && uiOpen) closeCraft(true);
   if (e.code.startsWith('Digit')) {
     const n = +e.code.slice(5);
-    if (n >= 1 && n <= HOTBAR.length) selectSlot(n - 1);
+    if (n >= 1 && n <= Math.min(9, hotbarLen())) selectSlot(n - 1);
   }
   if (['Space','ShiftLeft','ShiftRight'].includes(e.code)) e.preventDefault();
 });
@@ -598,6 +923,9 @@ function physics(dt) {
   }
 
   const EPS = 0.001;
+  // высота падения (для урона в выживании)
+  if (p.flying || inWater) p.fallDist = 0;
+  else if (p.vel.y < 0) p.fallDist += -p.vel.y * dt;
   // X
   p.pos.x += p.vel.x * dt;
   let hit = boxCollides(p.pos.x, p.pos.y, p.pos.z);
@@ -611,11 +939,19 @@ function physics(dt) {
   p.onGround = false;
   hit = boxCollides(p.pos.x, p.pos.y, p.pos.z);
   if (hit) {
-    if (p.vel.y <= 0) { p.pos.y = hit.y + 1 + EPS; p.onGround = true; }
+    if (p.vel.y <= 0) {
+      p.pos.y = hit.y + 1 + EPS; p.onGround = true;
+      const dmg = Math.floor(p.fallDist - 3.2);
+      if (mode === 'survival' && dmg > 0) damage(dmg);
+      p.fallDist = 0;
+    }
     else p.pos.y = hit.y - p.h - EPS;
     p.vel.y = 0;
   }
-  if (p.pos.y < -10) { findSpawn(); p.vel.set(0, 0, 0); } // выпал из мира
+  if (p.pos.y < -10) {         // выпал из мира
+    p.pos.copy(spawn); p.vel.set(0, 0, 0); p.fallDist = 0;
+    if (mode === 'survival') damage(99);
+  }
 
   camera.position.set(p.pos.x, p.pos.y + p.eye, p.pos.z);
   camera.rotation.set(0, 0, 0);
@@ -646,34 +982,259 @@ function raycast(maxDist) {
   return null;
 }
 
+// ---------- Зомби ----------
+const zombies = [];
+let zombieTimer = 3;
+
+function rayAABB(o, d, minX, minY, minZ, maxX, maxY, maxZ) {
+  let tmin = 0, tmax = 100;
+  const axes = [[o.x, d.x, minX, maxX], [o.y, d.y, minY, maxY], [o.z, d.z, minZ, maxZ]];
+  for (const [oo, dd, mn, mx] of axes) {
+    const inv = 1 / (dd || 1e-9);
+    let t0 = (mn - oo) * inv, t1 = (mx - oo) * inv;
+    if (t0 > t1) [t0, t1] = [t1, t0];
+    tmin = Math.max(tmin, t0); tmax = Math.min(tmax, t1);
+    if (tmax < tmin) return Infinity;
+  }
+  return tmin;
+}
+
+class Zombie {
+  constructor(x, y, z) {
+    this.pos = new THREE.Vector3(x, y, z);
+    this.vel = new THREE.Vector3();
+    this.w = 0.3; this.h = 1.8;
+    this.health = 10;
+    this.onGround = false;
+    this.attackCd = 0; this.hurtT = 0;
+    this.wanderT = 0; this.dir = Math.random() * Math.PI * 2; this.idle = false;
+    this.anim = Math.random() * 10;
+    this.buildMesh();
+    scene.add(this.group);
+  }
+  buildMesh() {
+    const skin  = new THREE.MeshLambertMaterial({ color: 0x4f9e48 });
+    const shirt = new THREE.MeshLambertMaterial({ color: 0x3a7ec2 });
+    const pants = new THREE.MeshLambertMaterial({ color: 0x3a4a7a });
+    this.mats = [skin, shirt, pants];
+    const box = (w, h, d, m) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m);
+    const g = new THREE.Group();
+    const head = box(.5, .5, .5, skin); head.position.y = 1.75;
+    const body = box(.5, .75, .25, shirt); body.position.y = 1.125;
+    g.add(head, body);
+    const limb = (m, px, py, arm) => {
+      const pivot = new THREE.Group();
+      pivot.position.set(px, py, 0);
+      const mesh = box(.22, .75, .22, m);
+      mesh.position.y = -.375;
+      pivot.add(mesh);
+      if (arm) pivot.rotation.x = -Math.PI / 2 * 0.92;   // руки вперёд
+      g.add(pivot);
+      return pivot;
+    };
+    this.armL = limb(skin, -.36, 1.55, true);
+    this.armR = limb(skin,  .36, 1.55, true);
+    this.legL = limb(pants, -.125, .75, false);
+    this.legR = limb(pants,  .125, .75, false);
+    this.group = g;
+  }
+  hurt(dmg, dir) {
+    this.health -= dmg;
+    this.hurtT = 0.35;
+    this.vel.x += dir.x * 7; this.vel.z += dir.z * 7;
+    this.vel.y = 4.5;
+    if (this.health <= 0) {
+      this.remove();
+      if (mode === 'survival' && Math.random() < 0.3) invAdd(ITEM_APPLE, 1);
+    }
+  }
+  remove() {
+    scene.remove(this.group);
+    const i = zombies.indexOf(this);
+    if (i >= 0) zombies.splice(i, 1);
+  }
+  update(dt) {
+    const cx = Math.floor(this.pos.x / CHUNK), cz = Math.floor(this.pos.z / CHUNK);
+    if (!getChunk(cx, cz)) return;
+    if (this.hurtT > 0) this.hurtT -= dt;
+    this.mats.forEach(m => m.emissive.setHex(this.hurtT > 0 ? 0x8a0000 : 0x000000));
+
+    const dx = player.pos.x - this.pos.x, dz = player.pos.z - this.pos.z;
+    const dist = Math.hypot(dx, dz);
+    if (dist > 70) { this.remove(); return; }
+
+    let mx = 0, mz = 0, speed = 0;
+    if (dist < 24 && dist > 0.3 && mode === 'survival') {
+      mx = dx / dist; mz = dz / dist; speed = 2.3;      // преследование
+    } else {
+      this.wanderT -= dt;
+      if (this.wanderT <= 0) {
+        this.wanderT = 2 + Math.random() * 3;
+        this.dir = Math.random() * Math.PI * 2;
+        this.idle = Math.random() < 0.35;
+      }
+      if (!this.idle) { mx = Math.sin(this.dir); mz = Math.cos(this.dir); speed = 0.8; }
+    }
+    this.vel.x = mx * speed; this.vel.z = mz * speed;
+    this.vel.y -= GRAVITY * dt;
+    const feet = getBlock(Math.floor(this.pos.x), Math.floor(this.pos.y + 0.2), Math.floor(this.pos.z));
+    if (feet === B.water) this.vel.y = Math.min(this.vel.y + 40 * dt, 2.5);   // всплывает
+
+    const EPS = 0.001;
+    let bumped = false;
+    this.pos.x += this.vel.x * dt;
+    let hit = aabbCollides(this.pos.x, this.pos.y, this.pos.z, this.w, this.h);
+    if (hit) { this.pos.x = this.vel.x > 0 ? hit.x - this.w - EPS : hit.x + 1 + this.w + EPS; bumped = true; }
+    this.pos.z += this.vel.z * dt;
+    hit = aabbCollides(this.pos.x, this.pos.y, this.pos.z, this.w, this.h);
+    if (hit) { this.pos.z = this.vel.z > 0 ? hit.z - this.w - EPS : hit.z + 1 + this.w + EPS; bumped = true; }
+    this.pos.y += this.vel.y * dt;
+    this.onGround = false;
+    hit = aabbCollides(this.pos.x, this.pos.y, this.pos.z, this.w, this.h);
+    if (hit) {
+      if (this.vel.y <= 0) { this.pos.y = hit.y + 1 + EPS; this.onGround = true; }
+      else this.pos.y = hit.y - this.h - EPS;
+      this.vel.y = 0;
+    }
+    if (bumped && this.onGround) this.vel.y = 7.5;      // перепрыгнуть блок
+    if (this.pos.y < -20) { this.remove(); return; }
+
+    // атака игрока
+    this.attackCd -= dt;
+    if (mode === 'survival' && dist < 1.5 && Math.abs(player.pos.y - this.pos.y) < 2 && this.attackCd <= 0) {
+      this.attackCd = 1.0;
+      damage(2);
+      player.vel.x += mx * 7; player.vel.z += mz * 7;
+      player.vel.y = Math.max(player.vel.y, 4);
+    }
+
+    // анимация и позиция
+    this.anim += speed * dt * 4;
+    const swing = speed > 0 ? Math.sin(this.anim) * 0.55 : 0;
+    this.legL.rotation.x = swing; this.legR.rotation.x = -swing;
+    this.armL.rotation.x = -Math.PI / 2 * 0.92 + swing * 0.15;
+    this.armR.rotation.x = -Math.PI / 2 * 0.92 - swing * 0.15;
+    this.group.position.copy(this.pos);
+    if (speed > 0) this.group.rotation.y = Math.atan2(mx, mz);
+  }
+}
+
+function trySpawnZombie() {
+  const a = Math.random() * Math.PI * 2, d = 16 + Math.random() * 14;
+  const x = Math.floor(player.pos.x + Math.sin(a) * d);
+  const z = Math.floor(player.pos.z + Math.cos(a) * d);
+  if (!getChunk(Math.floor(x / CHUNK), Math.floor(z / CHUNK))) return;
+  let y = WORLD_H - 1;
+  while (y > 0 && !isSolid(getBlock(x, y, z))) y--;
+  if (y <= 0) return;
+  if (getBlock(x, y + 1, z) === B.water) return;        // не в воде
+  zombies.push(new Zombie(x + 0.5, y + 1.01, z + 0.5));
+}
+function updateZombies(dt) {
+  if (mode === 'survival') {
+    zombieTimer -= dt;
+    if (zombieTimer <= 0) {
+      zombieTimer = 5;
+      if (zombies.length < 8) trySpawnZombie();
+    }
+  }
+  for (const z of [...zombies]) z.update(dt);
+}
+
+function attackDamage() {
+  if (mode === 'creative') return 1000;
+  const held = inventory[player.slot] && inventory[player.slot].id;
+  if (held === T.wsword) return 4;
+  if (held === T.ssword) return 5;
+  if (held != null && ITEMS[held] && ITEMS[held].tool) return 2;
+  return 1;
+}
+function attackZombie() {
+  const o = camera.position;
+  const d = new THREE.Vector3();
+  camera.getWorldDirection(d);
+  let best = null, bestT = 4.2;
+  for (const z of zombies) {
+    const t = rayAABB(o, d, z.pos.x - z.w, z.pos.y, z.pos.z - z.w,
+                            z.pos.x + z.w, z.pos.y + z.h, z.pos.z + z.w);
+    if (t < bestT) { bestT = t; best = z; }
+  }
+  if (!best) return false;
+  best.hurt(attackDamage(), d);
+  return true;
+}
+
 // ---------- Ломать / ставить ----------
 const mouse = { left: false, right: false, timer: 0 };
-function doAction() {
+const mining = { key: null, prog: 0 };   // прогресс ломания (выживание)
+
+function doBreakCreative() {
+  const hit = raycast(5.5);
+  if (hit && hit.block !== B.bedrock) setBlock(hit.x, hit.y, hit.z, B.air);
+}
+function doPlace() {
+  // яблоко в руке — съесть
+  if (mode === 'survival') {
+    const s = inventory[player.slot];
+    if (s && s.id === ITEM_APPLE) {
+      if (player.health >= 20) return;
+      player.health = Math.min(20, player.health + 4);
+      updateHearts();
+      s.count--; if (!s.count) inventory[player.slot] = null;
+      renderHotbar();
+      nameEl.textContent = '🍎 +2 ❤';
+      nameEl.style.opacity = 1;
+      clearTimeout(nameTimer);
+      nameTimer = setTimeout(() => nameEl.style.opacity = 0, 1100);
+      return;
+    }
+  }
   const hit = raycast(5.5);
   if (!hit) return;
-  if (mouse.left) {
-    if (hit.block !== B.bedrock) setBlock(hit.x, hit.y, hit.z, B.air);
-  } else if (mouse.right) {
-    const bx = hit.x + hit.nx, by = hit.y + hit.ny, bz = hit.z + hit.nz;
-    const cur = getBlock(bx, by, bz);
-    if (cur !== B.air && cur !== B.water) return;
-    // не ставить внутрь себя
-    const p = player.pos;
-    const inPlayer = bx + 1 > p.x - player.w && bx < p.x + player.w &&
-                     bz + 1 > p.z - player.w && bz < p.z + player.w &&
-                     by + 1 > p.y && by < p.y + player.h;
-    if (inPlayer) return;
-    setBlock(bx, by, bz, HOTBAR[player.slot]);
+  if (hit.block === B.crafting && mode === 'survival') { openCraft(true); return; }   // клик по верстаку
+  const bx = hit.x + hit.nx, by = hit.y + hit.ny, bz = hit.z + hit.nz;
+  const cur = getBlock(bx, by, bz);
+  if (cur !== B.air && cur !== B.water) return;
+  // не ставить внутрь себя
+  const p = player.pos;
+  const inPlayer = bx + 1 > p.x - player.w && bx < p.x + player.w &&
+                   bz + 1 > p.z - player.w && bz < p.z + player.w &&
+                   by + 1 > p.y && by < p.y + player.h;
+  if (inPlayer) return;
+  let id;
+  if (mode === 'creative') id = CREATIVE_HOTBAR[player.slot];
+  else {
+    const s = inventory[player.slot];
+    if (!s || !BLOCKS[s.id]) return;   // пусто или предмет (палки) — не ставится
+    id = s.id;
+    s.count--; if (!s.count) inventory[player.slot] = null;
+    renderHotbar();
   }
+  setBlock(bx, by, bz, id);
+}
+function doAction() {
+  if (mouse.left) { if (mode === 'creative') doBreakCreative(); }
+  else if (mouse.right) doPlace();
 }
 canvas.addEventListener('mousedown', e => {
   if (!playing) return;
-  if (e.button === 0) mouse.left = true;
+  if (e.button === 0) {
+    if (attackZombie()) return;    // удар по зомби — не начинаем копать
+    mouse.left = true;
+  }
   if (e.button === 2) mouse.right = true;
   if (e.button === 1) {                       // пипетка
     e.preventDefault();
     const hit = raycast(5.5);
-    if (hit) { const i = HOTBAR.indexOf(hit.block); if (i >= 0) selectSlot(i); }
+    if (hit) {
+      if (mode === 'creative') {
+        const i = CREATIVE_HOTBAR.indexOf(hit.block);
+        if (i >= 0) selectSlot(i);
+      } else {
+        const i = inventory.slice(0, 9).findIndex(s => s && s.id === hit.block);
+        if (i >= 0) selectSlot(i);
+      }
+    }
     return;
   }
   doAction();
@@ -686,10 +1247,10 @@ addEventListener('mouseup', e => {
 addEventListener('contextmenu', e => e.preventDefault());
 addEventListener('wheel', e => {
   if (!playing) return;
-  selectSlot((player.slot + (e.deltaY > 0 ? 1 : -1) + HOTBAR.length) % HOTBAR.length);
+  selectSlot((player.slot + (e.deltaY > 0 ? 1 : -1) + hotbarLen()) % hotbarLen());
 });
 
-// ---------- Запуск / пауза ----------
+// ---------- Запуск / пауза / режимы ----------
 let playing = false;
 const menu = document.getElementById('menu');
 const hud = document.getElementById('hud');
@@ -699,19 +1260,47 @@ function setPlaying(v) {
   menu.style.display = v ? 'none' : 'flex';
   hud.style.display = v ? 'block' : 'none';
   if (!v) {
-    document.getElementById('playBtn').textContent = 'Продолжить';
     for (const k in keys) keys[k] = false;
     mouse.left = mouse.right = false;
     joy.x = joy.y = 0;
     joyThumb.style.transform = 'translate(-50%,-50%)';
   }
 }
-document.getElementById('playBtn').addEventListener('click', () => {
+function resume() {
   if (IS_TOUCH) setPlaying(true);
   else canvas.requestPointerLock();
-});
+}
+function startGame(m) {
+  mode = m;
+  if (!started) { started = true; player.health = 20; }
+  if (mode === 'survival') player.flying = false;
+  document.getElementById('playBtn').style.display = 'inline-block';
+  if (player.slot >= hotbarLen()) player.slot = 0;
+  updateModeUI();
+  resume();
+}
+function updateModeUI() {
+  renderHotbar();
+  updateHearts();
+  document.getElementById('btnFly').style.display = mode === 'creative' ? 'flex' : 'none';
+  document.getElementById('btnCraft').style.display = mode === 'survival' ? 'flex' : 'none';
+  if (mode === 'survival') document.getElementById('btnDown').style.display = 'none';
+}
+document.getElementById('btnCreative').addEventListener('click', () => startGame('creative'));
+document.getElementById('btnSurvival').addEventListener('click', () => startGame('survival'));
+document.getElementById('playBtn').addEventListener('click', resume);
+
 document.addEventListener('pointerlockchange', () => {
-  if (!IS_TOUCH) setPlaying(document.pointerLockElement === canvas);
+  if (IS_TOUCH) return;
+  if (document.pointerLockElement === canvas) {
+    uiOpen = false;
+    craftEl.classList.remove('show');
+    setPlaying(true);
+  } else if (!uiOpen) {
+    setPlaying(false);
+  } else {
+    playing = false;   // открыт крафт/экран смерти — физика на паузе, меню не показываем
+  }
 });
 document.getElementById('btnPause').addEventListener('touchstart', e => {
   e.preventDefault(); e.stopPropagation();
@@ -794,8 +1383,8 @@ const lookEnd = e => {
     if (t.identifier !== look.id) continue;
     clearTimeout(look.holdTimer);
     if (look.breaking) { mouse.left = false; }
-    else if (look.moved < 12 && playing) {    // короткий тап — поставить блок
-      mouse.right = true; doAction(); mouse.right = false;
+    else if (look.moved < 12 && playing) {    // короткий тап — удар или поставить блок
+      if (!attackZombie()) { mouse.right = true; doAction(); mouse.right = false; }
     }
     look.id = null;
   }
@@ -814,35 +1403,350 @@ bindHold(document.getElementById('btnJump'), 'Space');
 bindHold(document.getElementById('btnDown'), 'ShiftLeft');
 document.getElementById('btnFly').addEventListener('touchstart', e => {
   e.preventDefault(); e.stopPropagation();
+  if (mode !== 'creative') return;
   player.flying = !player.flying; player.vel.y = 0;
   document.getElementById('btnDown').style.display = player.flying ? 'flex' : 'none';
 });
+document.getElementById('btnCraft').addEventListener('touchstart', e => {
+  e.preventDefault(); e.stopPropagation();
+  if (playing && mode === 'survival') openCraft(false);
+});
 
-// ---------- HUD ----------
+// ---------- HUD: хотбар, сердца ----------
 const hotbarEl = document.getElementById('hotbar');
 const nameEl = document.getElementById('blockname');
+const heartsEl = document.getElementById('hearts');
 let nameTimer = null;
-HOTBAR.forEach((b, i) => {
-  const slot = document.createElement('div');
-  slot.className = 'slot' + (i === 0 ? ' active' : '');
-  const num = document.createElement('span');
-  num.className = 'num'; num.textContent = i + 1;
+
+function makeIcon(id) {
   const icon = document.createElement('canvas');
   icon.width = TS; icon.height = TS;
   const ic = icon.getContext('2d');
   ic.imageSmoothingEnabled = false;
-  ic.drawImage(atlasCanvas, BLOCKS[b].icon * TS, 0, TS, TS, 0, 0, TS, TS);
-  slot.append(num, icon);
-  slot.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); selectSlot(i); });
-  hotbarEl.append(slot);
-});
+  ic.drawImage(atlasCanvas, iconOf(id) * TS, 0, TS, TS, 0, 0, TS, TS);
+  return icon;
+}
+function renderHotbar() {
+  hotbarEl.innerHTML = '';
+  const n = hotbarLen();
+  if (player.slot >= n) player.slot = 0;
+  for (let i = 0; i < n; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'slot' + (i === player.slot ? ' active' : '');
+    const num = document.createElement('span');
+    num.className = 'num'; num.textContent = i < 9 ? i + 1 : '';
+    slot.append(num);
+    const id = mode === 'creative' ? CREATIVE_HOTBAR[i] : (inventory[i] && inventory[i].id);
+    if (id != null && id !== false) {
+      slot.append(makeIcon(id));
+      if (mode === 'survival') {
+        const cnt = document.createElement('span');
+        cnt.className = 'cnt'; cnt.textContent = inventory[i].count;
+        slot.append(cnt);
+      }
+    }
+    slot.addEventListener('touchstart', e => { e.preventDefault(); e.stopPropagation(); selectSlot(i); });
+    hotbarEl.append(slot);
+  }
+}
 function selectSlot(i) {
   player.slot = i;
   [...hotbarEl.children].forEach((el, j) => el.classList.toggle('active', j === i));
-  nameEl.textContent = BLOCKS[HOTBAR[i]].name;
+  const id = mode === 'creative' ? CREATIVE_HOTBAR[i] : (inventory[i] && inventory[i].id);
+  nameEl.textContent = id ? nameOf(id) : '';
   nameEl.style.opacity = 1;
   clearTimeout(nameTimer);
   nameTimer = setTimeout(() => nameEl.style.opacity = 0, 1200);
+}
+function updateHearts() {
+  if (mode !== 'survival') { heartsEl.style.display = 'none'; return; }
+  heartsEl.style.display = 'flex';
+  heartsEl.innerHTML = '';
+  for (let i = 0; i < 10; i++) {
+    const hp = player.health - i * 2;
+    const s = document.createElement('span');
+    s.textContent = '❤';
+    s.className = hp >= 2 ? 'full' : hp === 1 ? 'half' : 'empty';
+    heartsEl.append(s);
+  }
+}
+
+// ---------- Урон и смерть ----------
+const flashEl = document.getElementById('flash');
+function damage(n) {
+  if (mode !== 'survival' || player.health <= 0) return;
+  player.health = Math.max(0, player.health - n);
+  updateHearts();
+  flashEl.style.transition = 'none'; flashEl.style.opacity = 0.4;
+  requestAnimationFrame(() => { flashEl.style.transition = 'opacity .5s'; flashEl.style.opacity = 0; });
+  if (player.health <= 0) die();
+}
+function die() {
+  uiOpen = true; playing = false;
+  mouse.left = mouse.right = false;
+  document.getElementById('death').classList.add('show');
+  if (!IS_TOUCH && document.pointerLockElement) document.exitPointerLock();
+}
+document.getElementById('respawnBtn').addEventListener('click', () => {
+  player.health = 20; player.fallDist = 0;
+  player.pos.copy(spawn); player.vel.set(0, 0, 0);
+  inventory.fill(null);           // предметы теряются
+  updateHearts(); renderHotbar();
+  document.getElementById('death').classList.remove('show');
+  uiOpen = false;
+  resume();
+});
+
+// ---------- Крафт: интерфейс как в Minecraft ----------
+const craftEl = document.getElementById('craft');
+const craftGridEl = document.getElementById('craftGrid');
+const invMainEl = document.getElementById('invMain');
+const invHotEl = document.getElementById('invHot');
+const resultEl = document.getElementById('resultSlot');
+const cursorEl = document.getElementById('cursorItem');
+const bookEl = document.getElementById('book');
+
+let gridSize = 2;
+let craftGrid = new Array(4).fill(null);
+let cursor = null;                       // стак «в руке» {id,count}
+const slotEls = { grid: [], main: [], hot: [] };
+
+function openCraft(wb) {
+  gridSize = wb ? 3 : 2;
+  craftGrid = new Array(gridSize * gridSize).fill(null);
+  cursor = null;
+  uiOpen = true; playing = false;
+  mouse.left = mouse.right = false;
+  document.getElementById('craftTitle').textContent = wb ? 'Верстак' : 'Инвентарь';
+  bookEl.style.display = 'none';
+  buildCraftUI();
+  craftEl.classList.add('show');
+  if (!IS_TOUCH && document.pointerLockElement) document.exitPointerLock();
+}
+function closeCraft(noRelock) {
+  if (!craftEl.classList.contains('show')) return;
+  // вернуть предметы из сетки и «из руки» в инвентарь
+  for (const s of craftGrid) if (s) invAdd(s.id, s.count);
+  craftGrid.fill(null);
+  if (cursor) { invAdd(cursor.id, cursor.count); cursor = null; }
+  cursorEl.style.display = 'none';
+  craftEl.classList.remove('show');
+  uiOpen = false;
+  if (IS_TOUCH) { playing = true; }
+  else if (!noRelock) {
+    canvas.requestPointerLock();
+    setTimeout(() => { if (!document.pointerLockElement && !uiOpen) setPlaying(false); }, 400);
+  } else setPlaying(false);
+}
+document.getElementById('craftClose').addEventListener('click', () => closeCraft());
+document.getElementById('bookBtn').addEventListener('click', () => {
+  if (bookEl.style.display === 'none') { buildBook(); bookEl.style.display = 'block'; }
+  else bookEl.style.display = 'none';
+});
+
+function mkSlot(big) {
+  const el = document.createElement('div');
+  el.className = 'mslot' + (big ? ' big' : '');
+  return el;
+}
+function fillSlot(el, stack, ghost) {
+  el.innerHTML = '';
+  el.classList.toggle('ghost', !!ghost);
+  if (!stack) return;
+  el.append(makeIcon(stack.id));
+  if (stack.count > 1) {
+    const c = document.createElement('span');
+    c.className = 'cnt2'; c.textContent = stack.count;
+    el.append(c);
+  }
+}
+function buildCraftUI() {
+  craftGridEl.innerHTML = ''; invMainEl.innerHTML = ''; invHotEl.innerHTML = '';
+  slotEls.grid = []; slotEls.main = []; slotEls.hot = [];
+  craftGridEl.style.gridTemplateColumns = `repeat(${gridSize}, var(--slot))`;
+  for (let i = 0; i < gridSize * gridSize; i++) {
+    const el = mkSlot();
+    el.addEventListener('pointerdown', e => slotDown(craftGrid, i, e));
+    slotEls.grid.push(el); craftGridEl.append(el);
+  }
+  for (let i = 9; i < 36; i++) {
+    const el = mkSlot();
+    const idx = i;
+    el.addEventListener('pointerdown', e => slotDown(inventory, idx, e));
+    slotEls.main.push(el); invMainEl.append(el);
+  }
+  for (let i = 0; i < 9; i++) {
+    const el = mkSlot();
+    const idx = i;
+    el.addEventListener('pointerdown', e => slotDown(inventory, idx, e));
+    slotEls.hot.push(el); invHotEl.append(el);
+  }
+  resultEl.onpointerdown = resultDown;
+  refreshCraftUI();
+}
+function refreshCraftUI() {
+  slotEls.grid.forEach((el, i) => fillSlot(el, craftGrid[i]));
+  slotEls.main.forEach((el, i) => fillSlot(el, inventory[i + 9]));
+  slotEls.hot.forEach((el, i) => fillSlot(el, inventory[i]));
+  fillSlot(resultEl, computeResult(), true);
+  fillSlot(cursorEl, cursor);
+  cursorEl.style.display = cursor ? 'block' : 'none';
+  renderHotbar();
+}
+function slotDown(arr, i, e) {
+  e.preventDefault();
+  moveCursorEl(e);
+  const right = e.button === 2;
+  const s = arr[i];
+  if (!cursor) {
+    if (!s) return;
+    if (right) {
+      const take = Math.ceil(s.count / 2);
+      cursor = { id: s.id, count: take };
+      s.count -= take; if (!s.count) arr[i] = null;
+    } else { cursor = s; arr[i] = null; }
+  } else if (!s) {
+    if (right) {
+      arr[i] = { id: cursor.id, count: 1 };
+      cursor.count--; if (!cursor.count) cursor = null;
+    } else { arr[i] = cursor; cursor = null; }
+  } else if (s.id === cursor.id) {
+    const max = stackMax(s.id);
+    const move = Math.min(right ? 1 : cursor.count, max - s.count);
+    s.count += move; cursor.count -= move;
+    if (cursor.count <= 0) cursor = null;
+  } else { arr[i] = cursor; cursor = s; }   // обмен
+  refreshCraftUI();
+}
+function resultDown(e) {
+  e.preventDefault();
+  moveCursorEl(e);
+  const res = computeResult();
+  if (!res) return;
+  if (cursor && (cursor.id !== res.id || cursor.count + res.count > stackMax(res.id))) return;
+  if (cursor) cursor.count += res.count;
+  else cursor = { ...res };
+  for (let i = 0; i < craftGrid.length; i++) {
+    const s = craftGrid[i];
+    if (s) { s.count--; if (!s.count) craftGrid[i] = null; }
+  }
+  refreshCraftUI();
+}
+function moveCursorEl(e) {
+  if (e.clientX == null) return;
+  cursorEl.style.left = (e.clientX + 8) + 'px';
+  cursorEl.style.top = (e.clientY + 8) + 'px';
+}
+craftEl.addEventListener('pointermove', moveCursorEl);
+craftEl.addEventListener('contextmenu', e => e.preventDefault());
+
+// --- сопоставление рецептов ---
+function gridMatrix() {
+  const m = [];
+  for (let r = 0; r < gridSize; r++) {
+    const row = [];
+    for (let c = 0; c < gridSize; c++) {
+      const s = craftGrid[r * gridSize + c];
+      row.push(s ? s.id : null);
+    }
+    m.push(row);
+  }
+  return m;
+}
+function trimMatrix(m) {
+  let r0 = 0, r1 = m.length - 1, c0 = 0, c1 = m[0].length - 1;
+  const rowEmpty = r => m[r].every(v => v === null);
+  const colEmpty = c => m.every(row => row[c] === null);
+  while (r0 <= r1 && rowEmpty(r0)) r0++;
+  while (r1 >= r0 && rowEmpty(r1)) r1--;
+  if (r0 > r1) return null;
+  while (colEmpty(c0)) c0++;
+  while (colEmpty(c1)) c1--;
+  const out = [];
+  for (let r = r0; r <= r1; r++) out.push(m[r].slice(c0, c1 + 1));
+  return out;
+}
+function matchShaped(m, pat) {
+  if (m.length !== pat.length) return false;
+  for (let r = 0; r < pat.length; r++) {
+    if (m[r].length !== pat[r].length) return false;
+    for (let c = 0; c < pat[r].length; c++) {
+      const ch = pat[r][c];
+      const want = ch === ' ' ? null : KEY[ch];
+      if (m[r][c] !== want) return false;
+    }
+  }
+  return true;
+}
+function computeResult() {
+  const cells = craftGrid.filter(Boolean);
+  if (!cells.length) return null;
+  // бесформенные
+  outer:
+  for (const r of RECIPES) {
+    if (!r.shapeless) continue;
+    if (cells.length !== r.shapeless.length) continue;
+    const pool = [...r.shapeless];
+    for (const c of cells) {
+      const i = pool.indexOf(c.id);
+      if (i < 0) continue outer;
+      pool.splice(i, 1);
+    }
+    return { id: r.out[0], count: r.out[1] };
+  }
+  // по форме
+  const m = trimMatrix(gridMatrix());
+  if (!m) return null;
+  for (const r of RECIPES) {
+    if (!r.p) continue;
+    if (matchShaped(m, r.p)) return { id: r.out[0], count: r.out[1] };
+    if (r.mirror && matchShaped(m, mirrorPat(r.p))) return { id: r.out[0], count: r.out[1] };
+  }
+  return null;
+}
+
+// --- книга рецептов ---
+function buildBook() {
+  bookEl.innerHTML = '';
+  for (const r of RECIPES) {
+    const row = document.createElement('div');
+    row.className = 'book-row';
+    const left = document.createElement('div');
+    left.className = 'book-in';
+    if (r.p) {
+      const mini = document.createElement('div');
+      mini.className = 'mini-grid';
+      mini.style.gridTemplateColumns = `repeat(${r.p[0].length}, 22px)`;
+      for (const line of r.p) for (const ch of line) {
+        const cell = document.createElement('div');
+        cell.className = 'mini-cell';
+        if (ch !== ' ') cell.append(makeIcon(KEY[ch]));
+        mini.append(cell);
+      }
+      left.append(mini);
+      if (r.p.length > 2 || r.p[0].length > 2) {
+        const chip = document.createElement('span');
+        chip.className = 'chip'; chip.textContent = 'верстак';
+        left.append(chip);
+      }
+    } else {
+      for (const id of r.shapeless) left.append(makeIcon(id));
+      const any = document.createElement('span');
+      any.className = 'r-n'; any.textContent = 'в любом порядке';
+      left.append(any);
+    }
+    const arrow = document.createElement('span');
+    arrow.className = 'r-arrow'; arrow.textContent = '→';
+    const right = document.createElement('div');
+    right.className = 'book-in';
+    right.append(makeIcon(r.out[0]));
+    const lbl = document.createElement('span');
+    lbl.className = 'r-n';
+    lbl.textContent = nameOf(r.out[0]) + (r.out[1] > 1 ? ' ×' + r.out[1] : '');
+    right.append(lbl);
+    row.append(left, arrow, right);
+    bookEl.append(row);
+  }
 }
 
 // ---------- Главный цикл ----------
@@ -856,10 +1760,38 @@ function loop(now) {
 
   if (playing) {
     physics(dt);
-    // удержание кнопки — повторять действие
-    if (mouse.left || mouse.right) {
-      mouse.timer -= dt;
-      if (mouse.timer <= 0) { doAction(); mouse.timer = 0.26; }
+    updateZombies(dt);
+    if (mode === 'survival') {
+      // ломание с прогрессом
+      if (mouse.left) {
+        const hit = raycast(5.5);
+        if (hit && hit.block !== B.bedrock) {
+          const key = hit.x + ',' + hit.y + ',' + hit.z;
+          if (mining.key !== key) { mining.key = key; mining.prog = 0; }
+          mining.prog += dt;
+          const held = inventory[player.slot] && inventory[player.slot].id;
+          const need = (HARDNESS[hit.block] || 1) / toolMult(held, hit.block);
+          setMiningBar(mining.prog / need);
+          if (mining.prog >= need) {
+            let drop = (hit.block in DROPS) ? DROPS[hit.block] : hit.block;
+            if (hit.block === B.leaves) drop = Math.random() < 0.15 ? ITEM_APPLE : null;
+            setBlock(hit.x, hit.y, hit.z, B.air);
+            if (drop != null) invAdd(drop, 1);
+            mining.key = null; setMiningBar(0);
+          }
+        } else { mining.key = null; setMiningBar(0); }
+      } else if (mining.key) { mining.key = null; setMiningBar(0); }
+      // установка с повтором
+      if (mouse.right) {
+        mouse.timer -= dt;
+        if (mouse.timer <= 0) { doPlace(); mouse.timer = 0.26; }
+      }
+    } else {
+      // творчество: мгновенно, с повтором при удержании
+      if (mouse.left || mouse.right) {
+        mouse.timer -= dt;
+        if (mouse.timer <= 0) { doAction(); mouse.timer = 0.26; }
+      }
     }
     const hit = raycast(5.5);
     highlight.visible = !!hit;
@@ -872,10 +1804,18 @@ function loop(now) {
   if (fpsT > 0.5) { fps = Math.round(fpsN / fpsAcc); fpsAcc = 0; fpsN = 0; fpsT = 0; }
   debugEl.textContent =
     `FPS: ${fps}\nXYZ: ${player.pos.x.toFixed(1)} / ${player.pos.y.toFixed(1)} / ${player.pos.z.toFixed(1)}` +
+    `\nРежим: ${mode === 'creative' ? 'Творчество' : 'Выживание'}` +
+    (mode === 'survival' ? `\nЗомби: ${zombies.length}` : '') +
     (player.flying ? '\nПолёт (F)' : '');
   debugEl.style.whiteSpace = 'pre';
 
   renderer.render(scene, camera);
+}
+
+const mineBarEl = document.getElementById('minebar');
+function setMiningBar(f) {
+  mineBarEl.style.display = f > 0 ? 'block' : 'none';
+  mineBarEl.firstElementChild.style.width = Math.min(100, f * 100) + '%';
 }
 
 addEventListener('resize', () => {
@@ -898,7 +1838,11 @@ findSpawn();
   let y = WORLD_H - 1;
   while (y > 0 && !isSolid(getBlock(Math.floor(player.pos.x), y, Math.floor(player.pos.z)))) y--;
   player.pos.y = y + 1.2;
+  spawn.copy(player.pos);
 })();
+
+renderHotbar();
+updateHearts();
 
 requestAnimationFrame(loop);
 </script>
